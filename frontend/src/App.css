@@ -578,6 +578,22 @@ div {
   border: 1px solid var(--neon-cyan);
 }
 
+/* Upload area styling */
+.upload-area {
+  border: 2px dashed rgba(0, 255, 255, 0.3);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.2);
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.upload-area:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.3);
+}
+
 /* Responsive design */
 @media (max-width: 1200px) {
   main {

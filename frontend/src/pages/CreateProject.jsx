@@ -2,11 +2,16 @@ import { Upload, Camera } from 'lucide-react'
 import AIResults from '../components/AIResults'
 
 const CreateProject = ({
-  newProject, setNewProject,
-  selectedFile, setSelectedFile,
-  imagePreview, setImagePreview,
+  newProject,
+  setNewProject,
+  selectedFile,
+  setSelectedFile,
+  imagePreview,
+  setImagePreview,
   aiResults,
-  submitProject, isConnected, submitLoading
+  submitProject,
+  isConnected,
+  submitLoading,
 }) => {
   const handleFileSelect = (event) => {
     const file = event.target.files[0]
@@ -19,51 +24,71 @@ const CreateProject = ({
 
   return (
     <div className="cyber-card">
-      <h3 className="text-lg font-bold text-white mb-4">Create New Blue Carbon Project</h3>
+      <h3 className="text-lg font-bold text-white mb-4">
+        Create New Blue Carbon Project
+      </h3>
 
       {!isConnected && (
         <div className="bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-4 mb-6">
-          <p className="text-yellow-300 text-sm">⚠️ Please connect your wallet to create projects</p>
+          <p className="text-yellow-300 text-sm">
+            ⚠️ Please connect your wallet to create projects
+          </p>
         </div>
       )}
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-white mb-2">Project Name</label>
+          <label className="block text-sm font-medium text-white mb-2">
+            Project Name
+          </label>
           <input
             type="text"
             className="cyber-input w-full"
             value={newProject.name}
-            onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+            onChange={(e) =>
+              setNewProject({ ...newProject, name: e.target.value })
+            }
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-white mb-2">Location</label>
+          <label className="block text-sm font-medium text-white mb-2">
+            Location
+          </label>
           <input
             type="text"
             className="cyber-input w-full"
             value={newProject.location}
-            onChange={(e) => setNewProject({ ...newProject, location: e.target.value })}
+            onChange={(e) =>
+              setNewProject({ ...newProject, location: e.target.value })
+            }
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-white mb-2">Area (Hectares)</label>
+          <label className="block text-sm font-medium text-white mb-2">
+            Area (Hectares)
+          </label>
           <input
             type="number"
             className="cyber-input w-full"
             value={newProject.area}
-            onChange={(e) => setNewProject({ ...newProject, area: e.target.value })}
+            onChange={(e) =>
+              setNewProject({ ...newProject, area: e.target.value })
+            }
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-white mb-2">Ecosystem Type</label>
+          <label className="block text-sm font-medium text-white mb-2">
+            Ecosystem Type
+          </label>
           <select
             className="cyber-input w-full"
             value={newProject.ecosystemType}
-            onChange={(e) => setNewProject({ ...newProject, ecosystemType: e.target.value })}
+            onChange={(e) =>
+              setNewProject({ ...newProject, ecosystemType: e.target.value })
+            }
           >
             <option value="mangrove">Mangrove</option>
             <option value="seagrass">Seagrass</option>
@@ -72,17 +97,43 @@ const CreateProject = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-white mb-2">Project Image</label>
-          <div className="upload-area" onClick={() => document.getElementById('file-input').click()}>
-            <input id="file-input" type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+          <label className="block text-sm font-medium text-white mb-2">
+            Project Image
+          </label>
+          <div
+            className="upload-area"
+            onClick={() => document.getElementById('file-input').click()}
+          >
+            <input
+              id="file-input"
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
             {imagePreview ? (
-              <div className="relative">
-                <img src={imagePreview} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
+              <div className="relative w-[200px] h-[200px] mx-auto">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded-lg"
+                  style={{
+                    maxWidth: '200px',
+                    maxHeight: '200px',
+                    objectFit: 'cover',
+                  }}
+                />
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); setSelectedFile(null); setImagePreview(null); }}
-                  className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm"
-                >×</button>
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setSelectedFile(null)
+                    setImagePreview(null)
+                  }}
+                  className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-700"
+                >
+                  ×
+                </button>
               </div>
             ) : (
               <div className="text-white text-center py-8">
