@@ -175,7 +175,7 @@ const App = () => {
 
   return (
     <Router>
-      <div className="cyber-bg min-h-screen flex flex-col">
+      <div className="cyber-bg flex flex-col">
         <Header
           account={account}
           balance={balance}
