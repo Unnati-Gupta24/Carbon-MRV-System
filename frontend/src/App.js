@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ethers } from 'ethers'
 import Notification from './components/Notification'
 import Header from './components/Header'
@@ -42,22 +42,51 @@ const App = () => {
 
       const provider = new ethers.BrowserProvider(window.ethereum)
       const accounts = await provider.send('eth_requestAccounts', [])
+      
+      if (!accounts || accounts.length === 0) {
+        throw new Error('No accounts found')
+      }
+
       const account = accounts[0]
       setAccount(account)
       setIsConnected(true)
 
-      const balance = await provider.getBalance(account)
-      setBalance(ethers.formatEther(balance))
+      try {
+        const balance = await provider.getBalance(account)
+        setBalance(ethers.formatEther(balance))
+      } catch (balanceErr) {
+        console.error('Error fetching balance:', balanceErr)
+        setBalance('0')
+      }
 
       // verify user
-      const res = await fetch(`${BACKEND_URL}/verify/${account}`)
-      const data = await res.json()
-      if (data.verified) setIsVerified(true)
+      try {
+        const res = await fetch(`${BACKEND_URL}/verify/${account}`)
+        const data = await res.json()
+        if (data.verified) {
+          setIsVerified(true)
+        }
+      } catch (verifyErr) {
+        console.error('Error verifying user:', verifyErr)
+        // Don't show an error notification for verification failure
+      }
 
       showNotification('Wallet connected successfully', 'success')
     } catch (err) {
-      console.error(err)
-      showNotification('Failed to connect wallet', 'error')
+      console.error('Wallet connection error:', err)
+      setIsConnected(false)
+      setAccount('')
+      setBalance('0')
+      setIsVerified(false)
+      
+      // Show specific error messages
+      if (!window.ethereum) {
+        showNotification('Please install MetaMask to connect wallet', 'error')
+      } else if (err.code === 4001) {
+        showNotification('You rejected the connection request', 'error')
+      } else {
+        showNotification(err.message || 'Failed to connect wallet', 'error')
+      }
     } finally {
       setLoading(false)
     }
@@ -78,7 +107,7 @@ const App = () => {
     }
   }
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       if (!account) return
       const res = await fetch(`${BACKEND_URL}/api/projects/user/${account}`)
@@ -91,7 +120,7 @@ const App = () => {
     } catch (err) {
       console.error('Failed to fetch projects:', err)
     }
-  }
+  }, [account])
 
   useEffect(() => {
     fetchStats()
@@ -101,7 +130,7 @@ const App = () => {
     if (isConnected) {
       fetchProjects()
     }
-  }, [isConnected, account])
+  }, [isConnected, account, fetchProjects])
 
   const submitProject = async () => {
     if (!isConnected) {
