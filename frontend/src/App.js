@@ -4,6 +4,7 @@ import { ethers } from 'ethers'
 import Notification from './components/Notification'
 import Header from './components/Header'
 import Navigation from './components/Navigation'
+import Token from './components/Token'
 
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
@@ -42,7 +43,7 @@ const App = () => {
 
       const provider = new ethers.BrowserProvider(window.ethereum)
       const accounts = await provider.send('eth_requestAccounts', [])
-      
+
       if (!accounts || accounts.length === 0) {
         throw new Error('No accounts found')
       }
@@ -78,7 +79,7 @@ const App = () => {
       setAccount('')
       setBalance('0')
       setIsVerified(false)
-      
+
       // Show specific error messages
       if (!window.ethereum) {
         showNotification('Please install MetaMask to connect wallet', 'error')
@@ -202,17 +203,19 @@ const App = () => {
     }
   }
 
+  const headerProps = {
+    account,
+    balance,
+    isConnected,
+    isVerified,
+    connectWallet,
+    loading,
+  }
+
   return (
     <Router>
       <div className="cyber-bg flex flex-col">
-        <Header
-          account={account}
-          balance={balance}
-          isConnected={isConnected}
-          isVerified={isVerified}
-          connectWallet={connectWallet}
-          loading={loading}
-        />
+        <Header {...headerProps} />
         <Navigation />
         <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
           <Routes>
@@ -242,6 +245,7 @@ const App = () => {
               }
             />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/token" element={<Token />} />
           </Routes>
         </main>
         <Notification notification={notification} />
