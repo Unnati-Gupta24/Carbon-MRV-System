@@ -10,6 +10,11 @@ const AIResults = ({ aiResults }) => {
         <p>🎯 Confidence: <span className="text-green-400">{Math.round(aiResults.confidence * 100)}%</span></p>
         <p>📏 Detected Area: <span className="text-green-400">{aiResults.area_detected?.toFixed(1)} hectares</span></p>
       </div>
+      <div>
+        <button className="mt-4 cyber-button-sm">
+          Convert Carbon credits into tokens
+        </button>
+      </div>
     </div>
   )
 }
