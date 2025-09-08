@@ -3,7 +3,7 @@ import { useState } from 'react'
 const Token = () => {
   const [isMinting, setIsMinting] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [nftImage, setNftImage] = useState('')
+  const [nftMinted, setNftMinted] = useState(false) // Add this new state
 
   // Mock data
   const carbonCredits = 150
@@ -11,33 +11,7 @@ const Token = () => {
     vegetationHealth: 'Excellent',
     area_detected: 45.7,
     location: 'Amazon Rainforest Sector-7',
-    verificationDate: new Date().toLocaleDateString()
-  }
-
-  const generateRandomNFT = () => {
-    const colors = ['#00ff88', '#0099ff', '#ff0080', '#ffff00', '#ff8800', '#8800ff']
-    const shapes = ['circle', 'rect', 'polygon']
-    const randomColor1 = colors[Math.floor(Math.random() * colors.length)]
-    const randomColor2 = colors[Math.floor(Math.random() * colors.length)]
-    const randomId = Math.floor(Math.random() * 10000)
-
-    return `data:image/svg+xml;base64,${btoa(`
-      <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="grad${randomId}" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:${randomColor1};stop-opacity:1" />
-            <stop offset="100%" style="stop-color:${randomColor2};stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <rect width="100%" height="100%" fill="#000012"/>
-        <circle cx="200" cy="150" r="${50 + Math.random() * 50}" fill="url(#grad${randomId})" opacity="0.8"/>
-        <rect x="${100 + Math.random() * 100}" y="${200 + Math.random() * 50}" width="${50 + Math.random() * 50}" height="${50 + Math.random() * 50}" fill="${randomColor1}" opacity="0.6"/>
-        <polygon points="${150 + Math.random() * 100},${250 + Math.random() * 50} ${200 + Math.random() * 100},${300 + Math.random() * 50} ${250 + Math.random() * 100},${200 + Math.random() * 50}" fill="${randomColor2}" opacity="0.7"/>
-        <text x="200" y="50" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#ffffff">Carbon Credit NFT</text>
-        <text x="200" y="80" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#cccccc">${carbonCredits} Credits</text>
-        <text x="200" y="370" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#888888">#${randomId}</text>
-      </svg>
-    `)}`
+    verificationDate: new Date().toLocaleDateString(),
   }
 
   const mintNFT = async () => {
@@ -52,7 +26,7 @@ const Token = () => {
 
       // Get accounts
       const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts'
+        method: 'eth_requestAccounts',
       })
 
       if (accounts.length === 0) {
@@ -75,14 +49,8 @@ const Token = () => {
       })
 
       console.log('Transaction sent:', txHash)
-
-      // Generate random NFT image
-      const generatedImage = generateRandomNFT()
-      setNftImage(generatedImage)
-
-      // Show success modal
+      setNftMinted(true) // Set this after successful transaction
       setShowSuccessModal(true)
-
     } catch (error) {
       console.error('Minting failed:', error)
       if (error.code === 4001) {
@@ -96,23 +64,10 @@ const Token = () => {
   }
 
   const downloadNFT = () => {
-    // Convert base64 to blob and download
-    const base64Data = nftImage.split(',')[1]
-    const byteCharacters = atob(base64Data)
-    const byteNumbers = new Array(byteCharacters.length)
-    
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i)
-    }
-    
-    const byteArray = new Uint8Array(byteNumbers)
-    const blob = new Blob([byteArray], { type: 'image/svg+xml' })
-    
     const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = `carbon-credit-nft-${Date.now()}.svg`
+    link.href = '/nft.png' // Assuming nft.png is in public folder
+    link.download = `carbon-credit-nft-${Date.now()}.png`
     link.click()
-    URL.revokeObjectURL(link.href)
   }
 
   return (
@@ -120,7 +75,7 @@ const Token = () => {
       {/* Cyberpunk background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20"></div>
       <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_24px,rgba(255,255,255,0.03)_25px,rgba(255,255,255,0.03)_26px,transparent_27px,transparent_74px,rgba(255,255,255,0.03)_75px,rgba(255,255,255,0.03)_76px,transparent_77px,transparent)] bg-[length:100px_100px]"></div>
-      
+
       <div className="relative z-10 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -132,35 +87,46 @@ const Token = () => {
           </div>
 
           <div className="bg-black/80 border border-cyan-500/50 rounded-lg p-6 backdrop-blur-sm shadow-[0_0_20px_rgba(0,255,255,0.3)]">
-            
             {/* Project Data Display */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {/* Left Panel */}
               <div className="space-y-4">
                 <div className="border border-green-500/30 bg-green-500/10 p-4 rounded">
-                  <h3 className="text-green-400 font-mono text-sm mb-3">◢ CARBON DATA MATRIX ◤</h3>
+                  <h3 className="text-green-400 font-mono text-sm mb-3">
+                    ◢ CARBON DATA MATRIX ◤
+                  </h3>
                   <div className="space-y-2 text-sm font-mono">
                     <div className="flex justify-between">
                       <span className="text-gray-400">[CREDITS]:</span>
-                      <span className="text-green-400 font-bold">{carbonCredits}</span>
+                      <span className="text-green-400 font-bold">
+                        {carbonCredits}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">[BIO_STATUS]:</span>
-                      <span className="text-cyan-400">{projectDetails.vegetationHealth}</span>
+                      <span className="text-cyan-400">
+                        {projectDetails.vegetationHealth}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">[AREA_HA]:</span>
-                      <span className="text-white">{projectDetails.area_detected.toFixed(1)}</span>
+                      <span className="text-white">
+                        {projectDetails.area_detected.toFixed(1)}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="border border-purple-500/30 bg-purple-500/10 p-4 rounded">
-                  <h3 className="text-purple-400 font-mono text-sm mb-3">◢ MINTING INFO ◤</h3>
+                  <h3 className="text-purple-400 font-mono text-sm mb-3">
+                    ◢ MINTING INFO ◤
+                  </h3>
                   <div className="space-y-2 text-sm font-mono">
                     <div>
                       <span className="text-gray-400">[COST]: </span>
-                      <span className="text-purple-400">0.0000000001 MATIC</span>
+                      <span className="text-purple-400">
+                        0.0000000001 MATIC
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-400">[NETWORK]: </span>
@@ -176,11 +142,35 @@ const Token = () => {
 
               {/* Right Panel - Preview */}
               <div className="border border-cyan-500/30 bg-cyan-500/5 p-4 rounded">
-                <h3 className="text-cyan-400 font-mono text-sm mb-3">◢ NFT PREVIEW ◤</h3>
+                <h3 className="text-cyan-400 font-mono text-sm mb-3">
+                  ◢ NFT PREVIEW ◤
+                </h3>
                 <div className="aspect-square bg-black/50 rounded border border-green-500/30 flex items-center justify-center">
-                  <div className="text-gray-500 font-mono text-sm">
-                    Random NFT will be generated after minting
-                  </div>
+                  {nftMinted ? (
+                    <img
+                      src="/nft.png"
+                      alt="NFT Preview"
+                      className="w-[200px] h-[200px] object-contain"
+                    />
+                  ) : (
+                    <div className="text-cyan-400/50 font-mono text-sm text-center p-4">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-16 w-16 mx-auto mb-4 opacity-50"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                      NFT will be revealed after successful transaction
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -212,7 +202,9 @@ const Token = () => {
           <div className="mt-6 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-900/30 border border-purple-500/30 rounded-full">
               <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-              <span className="text-purple-400 font-mono text-xs">POLYGON AMOY TESTNET</span>
+              <span className="text-purple-400 font-mono text-xs">
+                POLYGON AMOY TESTNET
+              </span>
             </div>
           </div>
         </div>
@@ -223,14 +215,16 @@ const Token = () => {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
           <div className="bg-black border-2 border-green-500 rounded-lg p-8 max-w-md w-full mx-4 shadow-[0_0_30px_rgba(0,255,0,0.3)]">
             <div className="text-center">
-              <h2 className="text-2xl font-mono text-green-400 mb-4">◢ NFT MINTED ◤</h2>
-              
-              {/* Show the generated NFT */}
+              <h2 className="text-2xl font-mono text-green-400 mb-4">
+                ◢ NFT MINTED ◤
+              </h2>
+
+              {/* Show the static NFT */}
               <div className="mb-6">
-                <img 
-                  src={nftImage} 
-                  alt="Generated NFT" 
-                  className="w-full max-w-xs mx-auto border border-green-500/50 rounded"
+                <img
+                  src="/nft.png"
+                  alt="NFT"
+                  className="w-[200px] h-[200px] object-contain mx-auto border border-green-500/50 rounded"
                 />
               </div>
 
