@@ -3,9 +3,8 @@ import { useState } from 'react'
 const Token = () => {
   const [isMinting, setIsMinting] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [nftMinted, setNftMinted] = useState(false) // Add this new state
+  const [nftMinted, setNftMinted] = useState(false)
 
-  // Mock data
   const carbonCredits = 150
   const projectDetails = {
     vegetationHealth: 'Excellent',
@@ -24,7 +23,6 @@ const Token = () => {
         return
       }
 
-      // Get accounts
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts',
       })
