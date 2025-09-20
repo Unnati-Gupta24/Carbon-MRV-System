@@ -8,12 +8,10 @@ require('dotenv').config()
 
 const app = express()
 
-// Middleware
 app.use(cors())
 app.use(express.json())
 app.use('/uploads', express.static('uploads'))
 
-// File upload configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads'
@@ -34,7 +32,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, 
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
       cb(null, true)
@@ -44,7 +42,6 @@ const upload = multer({
   },
 })
 
-// Smart Contract Configuration
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS
 const CONTRACT_ABI = [
   [
@@ -650,7 +647,6 @@ const CONTRACT_ABI = [
 ]
 ]
 
-// Initialize blockchain connection only if required environment variables exist
 let provider, wallet, contract
 
 const initializeBlockchain = () => {
@@ -665,18 +661,15 @@ const initializeBlockchain = () => {
       return false
     }
 
-    // Use Polygon Amoy testnet RPC
     const RPC_URL = process.env.RPC_URL || 'https://rpc-amoy.polygon.technology/'
     
     provider = new ethers.JsonRpcProvider(RPC_URL)
-    
-    // Remove '0x' prefix if present and ensure proper format
+   
     let privateKey = process.env.PRIVATE_KEY
     if (privateKey.startsWith('0x')) {
       privateKey = privateKey.slice(2)
     }
-    
-    // Validate private key length
+  
     if (privateKey.length !== 64) {
       throw new Error('Invalid private key length')
     }
@@ -698,15 +691,12 @@ const initializeBlockchain = () => {
   }
 }
 
-// Initialize blockchain connection
 const blockchainEnabled = initializeBlockchain()
 
-// AI Model Integration Functions
 async function callAIModel(imagePath, projectData) {
   try {
     console.log('🤖 Analyzing image with AI model:', imagePath)
 
-    // Option 1: Call your Python AI model
     const { spawn } = require('child_process')
 
     return new Promise((resolve, reject) => {
@@ -752,7 +742,6 @@ async function callAIModel(imagePath, projectData) {
   }
 }
 
-// Generate mock AI results for testing
 function generateMockAIResults(projectData) {
   const ecosystemMultipliers = {
     mangrove: { base: 10, variance: 3 },
@@ -770,15 +759,14 @@ function generateMockAIResults(projectData) {
     carbonCredits: carbonCredits,
     ecosystemType: projectData.ecosystemType,
     vegetationHealth: Math.random() > 0.3 ? 'good' : 'moderate',
-    confidence: 0.75 + Math.random() * 0.2, // 75-95%
-    area_detected: projectData.area * (0.9 + Math.random() * 0.2), // 90-110% of reported
-    ndvi: 0.3 + Math.random() * 0.4, // 0.3-0.7
+    confidence: 0.75 + Math.random() * 0.2, 
+    area_detected: projectData.area * (0.9 + Math.random() * 0.2), 
+    ndvi: 0.3 + Math.random() * 0.4, 
     analysis_timestamp: new Date().toISOString(),
     image_quality: Math.random() > 0.2 ? 'good' : 'moderate',
   }
 }
 
-// Store AI results (simple file storage - replace with IPFS in production)
 function storeAIResults(aiResults) {
   const hash = require('crypto')
     .createHash('sha256')
@@ -797,7 +785,6 @@ function storeAIResults(aiResults) {
   return hash
 }
 
-// Create new project with AI analysis
 app.post('/api/projects', upload.single('image'), async (req, res) => {
   try {
     console.log('📋 New project submission received')
@@ -813,7 +800,6 @@ app.post('/api/projects', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' })
     }
 
-    // Step 1: Analyze image with AI
     const projectData = {
       name,
       location,
@@ -824,14 +810,12 @@ app.post('/api/projects', upload.single('image'), async (req, res) => {
 
     const aiResults = await callAIModel(imageFile.path, projectData)
 
-    // Step 2: Store AI results
     const aiResultsHash = storeAIResults(aiResults)
-    const imageHash = imageFile.filename // Simple file reference
+    const imageHash = imageFile.filename
 
     let blockchainResult = null
-    let projectId = Math.floor(Math.random() * 1000000) // Fallback ID
+    let projectId = Math.floor(Math.random() * 1000000) 
 
-    // Step 3: Create project on blockchain (if enabled)
     if (blockchainEnabled && contract) {
       try {
         console.log('⛓️ Creating project on blockchain...')
@@ -847,7 +831,6 @@ app.post('/api/projects', upload.single('image'), async (req, res) => {
         const receipt = await tx.wait()
         console.log('✅ Project created on blockchain:', receipt.transactionHash)
 
-        // Extract project ID from event logs
         if (receipt.logs && receipt.logs.length > 0) {
           const projectCreatedEvent = receipt.logs.find(log => {
             try {
@@ -870,7 +853,6 @@ app.post('/api/projects', upload.single('image'), async (req, res) => {
           gasUsed: receipt.gasUsed.toString()
         }
 
-        // Step 4: Issue carbon credits if AI analysis is positive
         if (aiResults.carbonCredits > 0 && aiResults.confidence > 0.7) {
           console.log('🌱 Issuing carbon credits...')
 
@@ -906,7 +888,6 @@ app.post('/api/projects', upload.single('image'), async (req, res) => {
   }
 })
 
-// Get user's projects
 app.get('/api/projects/user/:address', async (req, res) => {
   try {
     const userAddress = req.params.address
@@ -945,7 +926,6 @@ app.get('/api/projects/user/:address', async (req, res) => {
   }
 })
 
-// Get single project details
 app.get('/api/projects/:id', async (req, res) => {
   try {
     const projectId = req.params.id
@@ -973,7 +953,6 @@ app.get('/api/projects/:id', async (req, res) => {
       aiResultsHash: projectData[10],
     }
 
-    // Load AI results if available
     if (project.aiResultsHash) {
       try {
         const aiResultsPath = `ai_results/${project.aiResultsHash}.json`
@@ -992,7 +971,6 @@ app.get('/api/projects/:id', async (req, res) => {
   }
 })
 
-// Get platform statistics
 app.get('/api/stats', async (req, res) => {
   try {
     if (!blockchainEnabled || !contract) {
@@ -1017,7 +995,6 @@ app.get('/api/stats', async (req, res) => {
   }
 })
 
-// Check if address is verified organization
 app.get('/api/verify/:address', async (req, res) => {
   try {
     const address = req.params.address
@@ -1057,7 +1034,6 @@ app.get('/api/admin', async (req, res) => {
   }
 })
 
-// Add verified organization (admin only)
 app.post('/api/admin/verify-org', async (req, res) => {
   try {
     const { organizationAddress } = req.body
@@ -1073,7 +1049,6 @@ app.post('/api/admin/verify-org', async (req, res) => {
       })
     }
 
-    // Check if current wallet is admin
     const adminAddress = await contract.admin()
     const currentAddress = wallet.address
 
@@ -1100,7 +1075,6 @@ app.post('/api/admin/verify-org', async (req, res) => {
   }
 })
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -1115,7 +1089,6 @@ app.get('/health', (req, res) => {
   })
 })
 
-// Error handling middleware
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
