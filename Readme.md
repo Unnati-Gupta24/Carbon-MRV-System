@@ -100,13 +100,28 @@ npm start
 ```
 blue-carbon-project/
 ├── backend/
-│   ├── server.js
-│   ├── app.js
 │   ├── ai_results/
+│   ├── contract/
+│   │   └── BlueCarbonRegistry.sol
 │   ├── controllers/
-│   ├── routes/
+│   │   ├── adminController.js
+│   │   ├── healthController.js
+│   │   └── projectController.js
 │   ├── models/
-│   └── contracts/
+│   │   ├── aiModel.js
+│   │   └── blockchainModel.js
+│   ├── routes/
+│   │   ├── adminRoutes.js
+│   │   ├── healthRoutes.js
+│   │   └── projectRoutes.js
+│   ├── services/
+│   │   ├── aiService.js
+│   │   └── blockchainService.js
+│   ├── uploads/
+│   ├── utils/
+│   │   └── multerConfig.js
+│   ├── .env
+│   └── .gitignore
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
