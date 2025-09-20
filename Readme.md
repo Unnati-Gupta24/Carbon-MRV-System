@@ -101,7 +101,11 @@ npm start
 blue-carbon-project/
 ├── backend/
 │   ├── server.js
-│   ├── ai_model.py
+│   ├── app.js
+│   ├── ai_results/
+│   ├── controllers/
+│   ├── routes/
+│   ├── models/
 │   └── contracts/
 ├── frontend/
 │   ├── src/
