@@ -45,7 +45,7 @@ const AIResults = ({ aiResults }) => {
           className="cyber-button-sm bg-purple-900/50 border-purple-500/50 hover:bg-purple-700/50 
           transition-all duration-300 hover:scale-105"
         >
-          🎨 Take crypto rewards
+          Earn crypto rewards
         </button>
       </div>
     </div>
