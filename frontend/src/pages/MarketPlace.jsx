@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { ArrowUpDown, Settings, TrendingUp, TrendingDown, RefreshCw, Wallet, ExternalLink, Info, ChevronDown, Zap } from 'lucide-react';
+import { ArrowUpDown, Settings, TrendingUp, TrendingDown, RefreshCw, Wallet, ExternalLink, Info, ChevronDown, Zap, BarChart3, Activity } from 'lucide-react';
+import './MarketPlace.css';
 
 const Marketplace = () => {
   const [fromToken, setFromToken] = useState('ETH');
@@ -29,12 +30,12 @@ const Marketplace = () => {
   const [walletConnected, setWalletConnected] = useState(false);
 
   const tokens = [
-    { symbol: 'ETH', name: 'Ethereum', logo: '⟠' },
-    { symbol: 'BTC', name: 'Bitcoin', logo: '₿' },
-    { symbol: 'USDC', name: 'USD Coin', logo: '💲' },
-    { symbol: 'USDT', name: 'Tether', logo: '₮' },
-    { symbol: 'UNI', name: 'Uniswap', logo: '🦄' },
-    { symbol: 'MATIC', name: 'Polygon', logo: '🔷' }
+    { symbol: 'ETH', name: 'Ethereum', logo: '⟠', color: '#627EEA' },
+    { symbol: 'BTC', name: 'Bitcoin', logo: '₿', color: '#F7931A' },
+    { symbol: 'USDC', name: 'USD Coin', logo: '💲', color: '#2775CA' },
+    { symbol: 'USDT', name: 'Tether', logo: '₮', color: '#26A17B' },
+    { symbol: 'UNI', name: 'Uniswap', logo: '🦄', color: '#FF007A' },
+    { symbol: 'MATIC', name: 'Polygon', logo: '🔷', color: '#8247E5' }
   ];
 
   // Generate realistic chart data
@@ -124,122 +125,195 @@ const Marketplace = () => {
     setWalletConnected(!walletConnected);
   };
 
+  // Mini trend chart component
+  const MiniTrendChart = ({ data, isPositive, color }) => (
+    <div className="mini-chart">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data.slice(-8)}>
+          <Line 
+            type="monotone" 
+            dataKey="price" 
+            stroke={isPositive ? '#10B981' : '#EF4444'} 
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="marketplace-container">
+      {/* Animated background */}
+      <div className="background-animation"></div>
+      
       {/* Header */}
-      <nav className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+      <nav className="main-header">
+        <div className="header-content">
+          <div className="header-left">
+            <div className="logo-section">
+              <div className="logo-icon">⚡</div>
+              <h1 className="logo-text">
                 DeX Protocol
               </h1>
-              <nav className="hidden md:flex space-x-6">
-                <a href="#" className="text-white font-medium">Swap</a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Pool</a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Analytics</a>
-              </nav>
+            </div>
+            <nav className="nav-links">
+              <a href="#" className="nav-link active">Swap</a>
+              <a href="#" className="nav-link">Pool</a>
+              <a href="#" className="nav-link">Analytics</a>
+              <a href="#" className="nav-link">Portfolio</a>
+            </nav>
+          </div>
+          <div className="header-right">
+            <div className="network-indicator">
+              <div className="network-dot"></div>
+              <span>Ethereum</span>
             </div>
             <button
               onClick={connectWallet}
-              className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                walletConnected 
-                  ? 'bg-green-600 hover:bg-green-700 text-white' 
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }`}
+              className={`wallet-btn ${walletConnected ? 'connected' : ''}`}
             >
-              <Wallet className="w-4 h-4 inline mr-2" />
+              <Wallet className="wallet-icon" />
               {walletConnected ? '0x1234...5678' : 'Connect Wallet'}
             </button>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Price Ticker */}
-        <div className="mb-8 overflow-hidden">
-          <div className="flex space-x-8 animate-scroll">
+      <div className="main-content">
+        {/* Enhanced Price Ticker */}
+        <div className="price-ticker-container">
+          <div className="ticker-header">
+            <div className="ticker-title">
+              <Activity className="ticker-icon" />
+              <span>Live Market</span>
+            </div>
+            <div className="ticker-stats">
+              <span>24h Volume: $4.2B</span>
+              <span>Total TVL: $12.8B</span>
+            </div>
+          </div>
+          <div className="price-ticker">
             {tokens.map(token => (
               <div 
                 key={token.symbol}
-                className="flex items-center space-x-3 cursor-pointer hover:bg-gray-800/30 p-3 rounded-lg transition-colors"
+                className={`ticker-item ${selectedChart === token.symbol ? 'active' : ''}`}
                 onClick={() => setSelectedChart(token.symbol)}
               >
-                <span className="text-2xl">{token.logo}</span>
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-medium">{token.symbol}</span>
-                    <span className="text-gray-400 text-sm">${priceData[token.symbol]?.price.toLocaleString()}</span>
+                <div className="ticker-main">
+                  <div className="token-info">
+                    <span className="token-logo">{token.logo}</span>
+                    <div className="token-details">
+                      <span className="token-symbol">{token.symbol}</span>
+                      <span className="token-name">{token.name}</span>
+                    </div>
                   </div>
-                  <div className={`text-sm flex items-center ${
-                    priceData[token.symbol]?.change24h >= 0 ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    {priceData[token.symbol]?.change24h >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
-                    {priceData[token.symbol]?.change24h >= 0 ? '+' : ''}{priceData[token.symbol]?.change24h.toFixed(2)}%
+                  <div className="price-info">
+                    <span className="token-price">${priceData[token.symbol]?.price.toLocaleString()}</span>
+                    <div className={`price-change ${priceData[token.symbol]?.change24h >= 0 ? 'positive' : 'negative'}`}>
+                      {priceData[token.symbol]?.change24h >= 0 ? <TrendingUp className="trend-icon" /> : <TrendingDown className="trend-icon" />}
+                      {priceData[token.symbol]?.change24h >= 0 ? '+' : ''}{priceData[token.symbol]?.change24h.toFixed(2)}%
+                    </div>
                   </div>
+                </div>
+                <div className="ticker-chart">
+                  <MiniTrendChart 
+                    data={chartData} 
+                    isPositive={priceData[token.symbol]?.change24h >= 0}
+                    color={token.color}
+                  />
+                </div>
+                <div className="ticker-volume">
+                  <span>Vol: {priceData[token.symbol]?.volume}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Chart Section */}
-          <div className="lg:col-span-2">
-            <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-bold text-white mb-1">
-                    {selectedChart}/USD
-                  </h2>
-                  <p className="text-gray-400 text-sm">
-                    ${priceData[selectedChart]?.price.toLocaleString()} 
-                    <span className={`ml-2 ${priceData[selectedChart]?.change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      ({priceData[selectedChart]?.change24h >= 0 ? '+' : ''}{priceData[selectedChart]?.change24h.toFixed(2)}%)
-                    </span>
-                  </p>
+        <div className="content-grid">
+          {/* Enhanced Chart Section */}
+          <div className="chart-section">
+            <div className="chart-container">
+              <div className="chart-header">
+                <div className="chart-title">
+                  <div className="selected-token">
+                    <span className="selected-logo">{tokens.find(t => t.symbol === selectedChart)?.logo}</span>
+                    <div className="selected-info">
+                      <h2 className="pair-name">{selectedChart}/USD</h2>
+                      <div className="price-details">
+                        <span className="current-price">${priceData[selectedChart]?.price.toLocaleString()}</span>
+                        <span className={`price-change-badge ${priceData[selectedChart]?.change24h >= 0 ? 'positive' : 'negative'}`}>
+                          {priceData[selectedChart]?.change24h >= 0 ? '+' : ''}{priceData[selectedChart]?.change24h.toFixed(2)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="chart-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">24h High</span>
+                      <span className="stat-value">${(priceData[selectedChart]?.price * 1.05).toFixed(2)}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">24h Low</span>
+                      <span className="stat-value">${(priceData[selectedChart]?.price * 0.95).toFixed(2)}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Volume</span>
+                      <span className="stat-value">{priceData[selectedChart]?.volume}</span>
+                    </div>
+                  </div>
                 </div>
-                <button className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg">
-                  <RefreshCw className="w-5 h-5" />
-                </button>
+                <div className="chart-controls">
+                  <div className="time-selector">
+                    <button className="time-btn active">24H</button>
+                    <button className="time-btn">7D</button>
+                    <button className="time-btn">30D</button>
+                    <button className="time-btn">1Y</button>
+                  </div>
+                  <button className="refresh-btn">
+                    <RefreshCw className="refresh-icon" />
+                  </button>
+                </div>
               </div>
               
-              <div className="h-96">
+              <div className="chart-wrapper">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#6366F1" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2D3748" opacity={0.3} />
                     <XAxis 
                       dataKey="time" 
-                      stroke="#9CA3AF"
+                      stroke="#718096"
                       fontSize={12}
-                      tick={{ fill: '#9CA3AF' }}
+                      tick={{ fill: '#718096' }}
                     />
                     <YAxis 
-                      stroke="#9CA3AF"
+                      stroke="#718096"
                       fontSize={12}
-                      tick={{ fill: '#9CA3AF' }}
+                      tick={{ fill: '#718096' }}
                       tickFormatter={(value) => `$${value.toLocaleString()}`}
                     />
                     <Tooltip 
                       contentStyle={{
-                        backgroundColor: '#111827',
-                        border: '1px solid #374151',
+                        backgroundColor: '#1A202C',
+                        border: '1px solid #4A5568',
                         borderRadius: '12px',
-                        color: '#F9FAFB'
+                        color: '#F7FAFC',
+                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
                       }}
                       formatter={(value) => [`$${value.toLocaleString()}`, 'Price']}
                     />
                     <Area
                       type="monotone"
                       dataKey="price"
-                      stroke="#3B82F6"
-                      strokeWidth={2}
+                      stroke="#6366F1"
+                      strokeWidth={3}
                       fillOpacity={1}
                       fill="url(#colorPrice)"
                     />
@@ -249,47 +323,46 @@ const Marketplace = () => {
             </div>
           </div>
 
-          {/* Swap Interface */}
-          <div className="lg:col-span-1">
-            <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">Swap</h2>
+          {/* Enhanced Swap Interface */}
+          <div className="swap-section">
+            <div className="swap-container">
+              <div className="swap-header">
+                <h2 className="swap-title">
+                  <Zap className="swap-icon" />
+                  Instant Swap
+                </h2>
                 <button 
                   onClick={() => setShowSettings(!showSettings)}
-                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
+                  className="settings-btn"
                 >
-                  <Settings className="w-5 h-5" />
+                  <Settings className="settings-icon" />
                 </button>
               </div>
 
               {showSettings && (
-                <div className="mb-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
-                  <div className="mb-4">
-                    <label className="block text-sm text-gray-300 mb-2">
+                <div className="settings-panel">
+                  <div className="settings-group">
+                    <label className="settings-label">
                       Slippage Tolerance
                     </label>
-                    <div className="flex gap-2">
+                    <div className="slippage-options">
                       {['0.1', '0.5', '1.0'].map(val => (
                         <button
                           key={val}
                           onClick={() => setSlippage(val)}
-                          className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                            slippage === val 
-                              ? 'bg-blue-600 text-white' 
-                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                          }`}
+                          className={`slippage-btn ${slippage === val ? 'active' : ''}`}
                         >
                           {val}%
                         </button>
                       ))}
                     </div>
                   </div>
-                  <div className="text-sm text-gray-400">
-                    <div className="flex justify-between mb-1">
+                  <div className="settings-info">
+                    <div className="info-row">
                       <span>Gas Fee:</span>
                       <span>{gasFee}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="info-row">
                       <span>Network:</span>
                       <span>Ethereum</span>
                     </div>
@@ -297,19 +370,19 @@ const Marketplace = () => {
                 </div>
               )}
 
-              <div className="space-y-1">
+              <div className="swap-form">
                 {/* From Token */}
-                <div className="bg-gray-800/30 border border-gray-700 rounded-xl p-4">
-                  <div className="flex justify-between items-center mb-3">
-                    <label className="text-sm text-gray-400">From</label>
-                    <span className="text-sm text-gray-400">Balance: 12.5456</span>
+                <div className="token-input from-token">
+                  <div className="input-header">
+                    <label className="input-label">From</label>
+                    <span className="balance">Balance: 12.5456</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
+                  <div className="input-content">
+                    <div className="token-selector">
                       <select
                         value={fromToken}
                         onChange={(e) => setFromToken(e.target.value)}
-                        className="appearance-none bg-gray-700 text-white px-4 py-2 pr-8 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        className="token-select"
                       >
                         {tokens.map(token => (
                           <option key={token.symbol} value={token.symbol}>
@@ -317,45 +390,46 @@ const Marketplace = () => {
                           </option>
                         ))}
                       </select>
-                      <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                      <ChevronDown className="select-icon" />
                     </div>
                     <input
                       type="number"
                       value={fromAmount}
                       onChange={(e) => setFromAmount(e.target.value)}
                       placeholder="0.0"
-                      className="flex-1 bg-transparent text-white text-right text-2xl font-medium focus:outline-none placeholder-gray-500"
+                      className="amount-input"
                     />
                   </div>
-                  <div className="flex justify-end mt-2">
-                    <span className="text-sm text-gray-400">
+                  <div className="input-footer">
+                    <span className="usd-value">
                       ≈ ${fromAmount ? (parseFloat(fromAmount) * priceData[fromToken].price).toLocaleString() : '0.00'}
                     </span>
+                    <button className="max-btn">MAX</button>
                   </div>
                 </div>
 
                 {/* Swap Button */}
-                <div className="flex justify-center py-2">
+                <div className="swap-divider">
                   <button
                     onClick={swapTokens}
-                    className="p-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-xl transition-colors group"
+                    className="swap-arrow-btn"
                   >
-                    <ArrowUpDown className="w-5 h-5 text-gray-300 group-hover:text-white transform group-hover:rotate-180 transition-all duration-300" />
+                    <ArrowUpDown className="swap-arrow-icon" />
                   </button>
                 </div>
 
                 {/* To Token */}
-                <div className="bg-gray-800/30 border border-gray-700 rounded-xl p-4">
-                  <div className="flex justify-between items-center mb-3">
-                    <label className="text-sm text-gray-400">To</label>
-                    <span className="text-sm text-gray-400">Balance: 1,234.56</span>
+                <div className="token-input to-token">
+                  <div className="input-header">
+                    <label className="input-label">To</label>
+                    <span className="balance">Balance: 1,234.56</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
+                  <div className="input-content">
+                    <div className="token-selector">
                       <select
                         value={toToken}
                         onChange={(e) => setToToken(e.target.value)}
-                        className="appearance-none bg-gray-700 text-white px-4 py-2 pr-8 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        className="token-select"
                       >
                         {tokens.map(token => (
                           <option key={token.symbol} value={token.symbol}>
@@ -363,18 +437,18 @@ const Marketplace = () => {
                           </option>
                         ))}
                       </select>
-                      <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                      <ChevronDown className="select-icon" />
                     </div>
                     <input
                       type="number"
                       value={toAmount}
                       readOnly
                       placeholder="0.0"
-                      className="flex-1 bg-transparent text-white text-right text-2xl font-medium focus:outline-none placeholder-gray-500"
+                      className="amount-input"
                     />
                   </div>
-                  <div className="flex justify-end mt-2">
-                    <span className="text-sm text-gray-400">
+                  <div className="input-footer">
+                    <span className="usd-value">
                       ≈ ${toAmount ? (parseFloat(toAmount) * priceData[toToken].price).toLocaleString() : '0.00'}
                     </span>
                   </div>
@@ -383,44 +457,49 @@ const Marketplace = () => {
 
               {/* Swap Details */}
               {fromAmount && toAmount && (
-                <div className="mt-4 p-4 bg-gray-800/30 rounded-xl border border-gray-700">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between text-gray-300">
-                      <span>Rate</span>
-                      <span>1 {fromToken} = {(parseFloat(toAmount) / parseFloat(fromAmount)).toFixed(4)} {toToken}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-300">
-                      <span>Price Impact</span>
-                      <span className={parseFloat(priceImpact) > 3 ? 'text-red-400' : 'text-green-400'}>
-                        {priceImpact}%
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-gray-300">
-                      <span>Network Fee</span>
-                      <span>{gasFee}</span>
-                    </div>
+                <div className="swap-details">
+                  <div className="detail-row">
+                    <span>Rate</span>
+                    <span>1 {fromToken} = {(parseFloat(toAmount) / parseFloat(fromAmount)).toFixed(4)} {toToken}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span>Price Impact</span>
+                    <span className={parseFloat(priceImpact) > 3 ? 'high-impact' : 'low-impact'}>
+                      {priceImpact}%
+                    </span>
+                  </div>
+                  <div className="detail-row">
+                    <span>Network Fee</span>
+                    <span>{gasFee}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span>Minimum Received</span>
+                    <span>{(parseFloat(toAmount) * (1 - parseFloat(slippage) / 100)).toFixed(6)} {toToken}</span>
                   </div>
                 </div>
               )}
 
-              {/* Swap Button */}
+              {/* Enhanced Swap Button */}
               <button
                 onClick={handleSwap}
                 disabled={!walletConnected || !fromAmount || !toAmount || fromAmount === '0' || isLoading}
-                className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-600 text-white font-medium py-4 px-6 rounded-xl transition-all disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="main-swap-btn"
               >
                 {isLoading ? (
                   <>
-                    <RefreshCw className="w-5 h-5 animate-spin" />
+                    <RefreshCw className="btn-icon spinning" />
                     <span>Swapping...</span>
                   </>
                 ) : !walletConnected ? (
-                  'Connect Wallet'
+                  <>
+                    <Wallet className="btn-icon" />
+                    <span>Connect Wallet</span>
+                  </>
                 ) : !fromAmount || fromAmount === '0' ? (
-                  'Enter Amount'
+                  <span>Enter Amount</span>
                 ) : (
                   <>
-                    <Zap className="w-5 h-5" />
+                    <Zap className="btn-icon" />
                     <span>Swap Tokens</span>
                   </>
                 )}
