@@ -1,5 +1,6 @@
-import { Upload, Camera } from 'lucide-react'
+import { Upload, Camera, MapPin, Ruler, Leaf, AlertTriangle } from 'lucide-react'
 import AIResults from '../components/AIResults'
+import './CreateProject.css'
 
 const CreateProject = ({
   newProject,
@@ -12,6 +13,7 @@ const CreateProject = ({
   submitProject,
   isConnected,
   submitLoading,
+  darkMode
 }) => {
   const handleFileSelect = (event) => {
     const file = event.target.files[0]
@@ -22,147 +24,325 @@ const CreateProject = ({
     reader.readAsDataURL(file)
   }
 
+  const ecosystemOptions = [
+    { value: 'mangrove', label: 'Mangrove Forest', icon: '🌿', description: 'Tropical coastal wetlands' },
+    { value: 'seagrass', label: 'Seagrass Meadow', icon: '🌱', description: 'Marine flowering plants' },
+    { value: 'saltmarsh', label: 'Salt Marsh', icon: '🌾', description: 'Coastal wetland habitat' }
+  ]
+
   return (
-    <div className="cyber-card">
-      <h3 className="text-lg font-bold text-white mb-4">
-        Create New Blue Carbon Project
-      </h3>
-
-      {!isConnected && (
-        <div className="bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-4 mb-6">
-          <p className="text-yellow-300 text-sm">
-            ⚠️ Please connect your wallet to create projects
-          </p>
-        </div>
-      )}
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-white mb-2">
-            Project Name
-          </label>
-          <input
-            type="text"
-            className="cyber-input w-full"
-            value={newProject.name}
-            onChange={(e) =>
-              setNewProject({ ...newProject, name: e.target.value })
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-white mb-2">
-            Location
-          </label>
-          <input
-            type="text"
-            className="cyber-input w-full"
-            value={newProject.location}
-            onChange={(e) =>
-              setNewProject({ ...newProject, location: e.target.value })
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-white mb-2">
-            Area (Hectares)
-          </label>
-          <input
-            type="number"
-            className="cyber-input w-full"
-            value={newProject.area}
-            onChange={(e) =>
-              setNewProject({ ...newProject, area: e.target.value })
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-white mb-2">
-            Ecosystem Type
-          </label>
-          <select
-            className="cyber-input w-full"
-            value={newProject.ecosystemType}
-            onChange={(e) =>
-              setNewProject({ ...newProject, ecosystemType: e.target.value })
-            }
-          >
-            <option value="mangrove">Mangrove</option>
-            <option value="seagrass">Seagrass</option>
-            <option value="saltmarsh">Salt Marsh</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-white mb-2">
-            Project Image
-          </label>
-          <div
-            className="upload-area"
-            onClick={() => document.getElementById('file-input').click()}
-          >
-            <input
-              id="file-input"
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-            {imagePreview ? (
-              <div className="relative w-[200px] h-[200px] mx-auto">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-full object-cover rounded-lg"
-                  style={{
-                    maxWidth: '200px',
-                    maxHeight: '200px',
-                    objectFit: 'cover',
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setSelectedFile(null)
-                    setImagePreview(null)
-                  }}
-                  className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-700"
-                >
-                  ×
-                </button>
+    <div className="create-project-page">
+      {/* Page Header */}
+      <div className="page-header">
+        <div className="header-content hover-3d" data-tilt>
+          <div className="header-icon-container">
+            <div className="header-icon">
+              <Upload className="icon" />
+              <div className="icon-rings">
+                <div className="ring ring-1"></div>
+                <div className="ring ring-2"></div>
+                <div className="ring ring-3"></div>
               </div>
-            ) : (
-              <div className="text-white text-center py-8">
-                <Camera className="mx-auto h-12 w-12 text-cyan-300 mb-4" />
-                <p>Upload satellite image or aerial photo</p>
-              </div>
-            )}
+            </div>
+          </div>
+          <div className="header-text">
+            <h1 className="page-title">Create New Blue Carbon Project</h1>
+            <p className="page-subtitle">
+              Upload satellite imagery and project details for AI-powered carbon credit analysis
+            </p>
           </div>
         </div>
+        
+        {/* Progress Indicator */}
+        <div className="progress-indicator">
+          <div className="progress-steps">
+            <div className="step active">
+              <div className="step-number">1</div>
+              <span className="step-label">Project Details</span>
+            </div>
+            <div className="step-connector"></div>
+            <div className="step">
+              <div className="step-number">2</div>
+              <span className="step-label">AI Analysis</span>
+            </div>
+            <div className="step-connector"></div>
+            <div className="step">
+              <div className="step-number">3</div>
+              <span className="step-label">Verification</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <AIResults aiResults={aiResults} />
+      {/* Main Content */}
+      <div className="create-project-container">
+        {/* Connection Warning */}
+        {!isConnected && (
+          <div className="connection-warning hover-3d" data-tilt>
+            <div className="warning-icon">
+              <AlertTriangle className="icon" />
+              <div className="warning-pulse"></div>
+            </div>
+            <div className="warning-content">
+              <h3 className="warning-title">Wallet Connection Required</h3>
+              <p className="warning-message">
+                Please connect your wallet to create and manage carbon credit projects
+              </p>
+            </div>
+            <div className="warning-decoration"></div>
+          </div>
+        )}
 
-        <button
-          onClick={submitProject}
-          disabled={submitLoading || !isConnected}
-          className="cyber-button w-full"
-        >
-          {submitLoading ? (
-            <>
-              <div className="loading-spinner"></div>
-              <span className="text-white">Creating Project...</span>
-            </>
-          ) : (
-            <>
-              <Upload className="h-4 w-4 mr-2 text-white" />
-              <span className="text-white">Create Project & Analyze</span>
-            </>
-          )}
-        </button>
+        {/* Project Form */}
+        <div className="project-form-card">
+          <div className="form-header">
+            <div className="form-section-title">
+              <div className="section-icon">
+                <Leaf className="icon" />
+              </div>
+              <h2 className="section-title">Project Information</h2>
+              <p className="section-subtitle">Provide essential details about your carbon project</p>
+            </div>
+          </div>
+
+          <div className="form-content">
+            <div className="form-grid">
+              {/* Project Name Field */}
+              <div className="form-group">
+                <label className="form-label">
+                  <div className="label-content">
+                    <MapPin className="label-icon" />
+                    <span className="label-text">Project Name</span>
+                  </div>
+                  <span className="label-required">*</span>
+                </label>
+                <div className="input-container hover-3d" data-tilt>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={newProject.name}
+                    onChange={(e) =>
+                      setNewProject({ ...newProject, name: e.target.value })
+                    }
+                    placeholder="Enter a descriptive project name"
+                  />
+                  <div className="input-decoration"></div>
+                </div>
+              </div>
+
+              {/* Location Field */}
+              <div className="form-group">
+                <label className="form-label">
+                  <div className="label-content">
+                    <MapPin className="label-icon" />
+                    <span className="label-text">Location</span>
+                  </div>
+                  <span className="label-required">*</span>
+                </label>
+                <div className="input-container hover-3d" data-tilt>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={newProject.location}
+                    onChange={(e) =>
+                      setNewProject({ ...newProject, location: e.target.value })
+                    }
+                    placeholder="City, Country or GPS coordinates"
+                  />
+                  <div className="input-decoration"></div>
+                </div>
+              </div>
+
+              {/* Area Field */}
+              <div className="form-group">
+                <label className="form-label">
+                  <div className="label-content">
+                    <Ruler className="label-icon" />
+                    <span className="label-text">Area (Hectares)</span>
+                  </div>
+                  <span className="label-required">*</span>
+                </label>
+                <div className="input-container hover-3d" data-tilt>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={newProject.area}
+                    onChange={(e) =>
+                      setNewProject({ ...newProject, area: e.target.value })
+                    }
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                  />
+                  <div className="input-unit">ha</div>
+                  <div className="input-decoration"></div>
+                </div>
+              </div>
+
+              {/* Ecosystem Type Field */}
+              <div className="form-group">
+                <label className="form-label">
+                  <div className="label-content">
+                    <Leaf className="label-icon" />
+                    <span className="label-text">Ecosystem Type</span>
+                  </div>
+                  <span className="label-required">*</span>
+                </label>
+                <div className="select-container hover-3d" data-tilt>
+                  <select
+                    className="form-select"
+                    value={newProject.ecosystemType}
+                    onChange={(e) =>
+                      setNewProject({ ...newProject, ecosystemType: e.target.value })
+                    }
+                  >
+                    {ecosystemOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.icon} {option.label} - {option.description}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="select-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                  </div>
+                  <div className="input-decoration"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Image Upload Section */}
+            <div className="image-upload-section">
+              <div className="upload-header">
+                <label className="form-label">
+                  <div className="label-content">
+                    <Camera className="label-icon" />
+                    <span className="label-text">Project Image</span>
+                  </div>
+                  <span className="label-required">*</span>
+                  <span className="label-hint">Satellite imagery or aerial photos work best</span>
+                </label>
+              </div>
+
+              <div 
+                className="upload-area hover-3d" 
+                onClick={() => document.getElementById('file-input').click()}
+                data-tilt
+              >
+                <input
+                  id="file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="file-input-hidden"
+                />
+
+                {imagePreview ? (
+                  <div className="image-preview-container">
+                    <div className="image-preview">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="preview-image"
+                        style={{
+                          maxWidth: '200px',
+                          maxHeight: '200px',
+                          objectFit: 'cover',
+                        }}
+                      />
+                      <div className="image-overlay">
+                        <div className="overlay-content">
+                          <Camera className="overlay-icon" />
+                          <span className="overlay-text">Click to change image</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedFile(null)
+                        setImagePreview(null)
+                      }}
+                      className="remove-image-btn hover-3d"
+                      data-tilt
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="upload-placeholder">
+                    <div className="upload-icon-container">
+                      <Camera className="upload-icon" />
+                      <div className="upload-icon-glow"></div>
+                    </div>
+                    <div className="upload-text">
+                      <h3 className="upload-title">Upload Project Image</h3>
+                      <p className="upload-description">
+                        Upload satellite image or aerial photo for AI analysis
+                      </p>
+                      <div className="upload-specs">
+                        <span className="spec">JPG, PNG up to 10MB</span>
+                        <span className="spec-separator">•</span>
+                        <span className="spec">Minimum 800x600px</span>
+                      </div>
+                    </div>
+                    <div className="upload-cta">
+                      <div className="upload-btn-text">Click to browse</div>
+                      <div className="upload-drag-text">or drag and drop</div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="upload-decoration"></div>
+              </div>
+            </div>
+
+            {/* AI Results */}
+            <AIResults aiResults={aiResults} darkMode={darkMode} />
+
+            {/* Submit Button */}
+            <div className="form-submit">
+              <button
+                onClick={submitProject}
+                disabled={submitLoading || !isConnected}
+                className="submit-btn hover-3d"
+                data-tilt
+              >
+                <div className="btn-content">
+                  {submitLoading ? (
+                    <>
+                      <div className="btn-spinner">
+                        <div className="spinner-ring"></div>
+                      </div>
+                      <span className="btn-text">Creating Project...</span>
+                      <div className="progress-dots">
+                        <span className="dot"></span>
+                        <span className="dot"></span>
+                        <span className="dot"></span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="btn-icon" />
+                      <span className="btn-text">Create Project & Analyze</span>
+                      <div className="btn-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="btn-glow"></div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -5,6 +5,8 @@ import Notification from './components/Notification'
 import Header from './components/Header'
 import Navigation from './components/Navigation'
 import Token from './components/Token'
+import Footer from './components/Footer'
+import ThemeToggle from './components/ThemeToggle'
 
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
@@ -34,6 +36,28 @@ const App = () => {
   const [selectedFile, setSelectedFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [aiResults, setAiResults] = useState(null)
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode')
+    return saved !== null ? JSON.parse(saved) : true
+  })
+
+  // Theme toggle function
+  const toggleDarkMode = () => {
+    const newMode = !darkMode
+    setDarkMode(newMode)
+    localStorage.setItem('darkMode', JSON.stringify(newMode))
+  }
+
+  // Apply theme to document
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+      document.documentElement.classList.remove('light')
+    } else {
+      document.documentElement.classList.add('light')
+      document.documentElement.classList.remove('dark')
+    }
+  }, [darkMode])
 
   // === Wallet connect logic ===
   const connectWallet = async () => {
@@ -210,45 +234,102 @@ const App = () => {
     isVerified,
     connectWallet,
     loading,
+    darkMode,
   }
 
   return (
     <Router>
-      <div className="cyber-bg flex flex-col">
+      <div className={`app-container ${darkMode ? 'dark' : 'light'}`}>
+        {/* Animated background elements */}
+        <div className="bg-elements">
+          <div className="bg-circle bg-circle-1"></div>
+          <div className="bg-circle bg-circle-2"></div>
+          <div className="bg-circle bg-circle-3"></div>
+          <div className="floating-particles">
+            {[...Array(20)].map((_, i) => (
+              <div key={i} className={`particle particle-${i + 1}`}></div>
+            ))}
+          </div>
+        </div>
+
+        {/* Theme Toggle */}
+        <ThemeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+
+        {/* Header */}
         <Header {...headerProps} />
-        <Navigation />
-        <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
-          <Routes>
-            <Route
-              path="/"
-              element={<Dashboard stats={stats} projects={projects} />}
-            />
-            <Route
-              path="/projects"
-              element={<Projects projects={projects} />}
-            />
-            <Route
-              path="/create"
-              element={
-                <CreateProject
-                  newProject={newProject}
-                  setNewProject={setNewProject}
-                  selectedFile={selectedFile}
-                  setSelectedFile={setSelectedFile}
-                  imagePreview={imagePreview}
-                  setImagePreview={setImagePreview}
-                  aiResults={aiResults}
-                  submitProject={submitProject}
-                  isConnected={isConnected}
-                  submitLoading={submitLoading}
-                />
-              }
-            />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/token" element={<Token />} />
-          </Routes>
+        
+        {/* Navigation */}
+        <Navigation darkMode={darkMode} />
+
+        {/* Main Content */}
+        <main className="main-content">
+          <div className="content-container">
+            {/* Hero Section with 3D Cards */}
+            <div className="hero-section">
+              <div className="hero-stats">
+                <div className="stat-card hover-3d" data-tilt>
+                  <div className="stat-icon">🌱</div>
+                  <div className="stat-info">
+                    <h3>Total Projects</h3>
+                    <p>{stats.totalProjects || 0}</p>
+                  </div>
+                </div>
+                <div className="stat-card hover-3d" data-tilt>
+                  <div className="stat-icon">💰</div>
+                  <div className="stat-info">
+                    <h3>Credits Earned</h3>
+                    <p>{stats.totalCredits || 0}</p>
+                  </div>
+                </div>
+                <div className="stat-card hover-3d" data-tilt>
+                  <div className="stat-icon">🔗</div>
+                  <div className="stat-info">
+                    <h3>Verified Users</h3>
+                    <p>{stats.verifiedUsers || 0}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Routes */}
+            <Routes>
+              <Route
+                path="/"
+                element={<Dashboard stats={stats} projects={projects} darkMode={darkMode} />}
+              />
+              <Route
+                path="/projects"
+                element={<Projects projects={projects} darkMode={darkMode} />}
+              />
+              <Route
+                path="/create"
+                element={
+                  <CreateProject
+                    newProject={newProject}
+                    setNewProject={setNewProject}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
+                    imagePreview={imagePreview}
+                    setImagePreview={setImagePreview}
+                    aiResults={aiResults}
+                    submitProject={submitProject}
+                    isConnected={isConnected}
+                    submitLoading={submitLoading}
+                    darkMode={darkMode}
+                  />
+                }
+              />
+              <Route path="/marketplace" element={<Marketplace darkMode={darkMode} />} />
+              <Route path="/token" element={<Token darkMode={darkMode} />} />
+            </Routes>
+          </div>
         </main>
-        <Notification notification={notification} />
+
+        {/* Footer */}
+        <Footer darkMode={darkMode} />
+
+        {/* Notification */}
+        <Notification notification={notification} darkMode={darkMode} />
       </div>
     </Router>
   )

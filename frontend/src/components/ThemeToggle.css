@@ -1,0 +1,260 @@
+/* Theme Toggle Styles */
+.theme-toggle-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+}
+
+.theme-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 2rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.theme-toggle:hover::before {
+  left: 100%;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--accent-primary);
+}
+
+.theme-toggle.animating {
+  animation: toggleBounce 0.3s ease;
+}
+
+.toggle-track {
+  width: 60px;
+  height: 30px;
+  background: var(--bg-secondary);
+  border-radius: 15px;
+  position: relative;
+  border: 2px solid var(--border-color);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.toggle-thumb {
+  width: 24px;
+  height: 24px;
+  background: var(--accent-gradient);
+  border-radius: 50%;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transform: translateX(0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+html.dark .toggle-thumb {
+  transform: translateX(28px);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.toggle-icon {
+  width: 14px;
+  height: 14px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+html.dark .toggle-icon {
+  color: #cbd5e1;
+}
+
+.toggle-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Stars for dark mode */
+.toggle-stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+html.dark .toggle-stars {
+  opacity: 1;
+}
+
+.star {
+  position: absolute;
+  color: #fbbf24;
+  font-size: 8px;
+  animation: twinkle 2s infinite;
+}
+
+.star-1 { top: 20%; left: 15%; animation-delay: 0s; }
+.star-2 { top: 70%; left: 20%; animation-delay: 0.5s; }
+.star-3 { top: 30%; left: 70%; animation-delay: 1s; }
+.star-4 { top: 80%; left: 75%; animation-delay: 1.5s; }
+.star-5 { top: 50%; left: 85%; animation-delay: 0.3s; }
+.star-6 { top: 15%; left: 80%; animation-delay: 0.8s; }
+
+/* Clouds for light mode */
+.toggle-clouds {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+html.dark .toggle-clouds {
+  opacity: 0;
+}
+
+.cloud {
+  position: absolute;
+  color: #94a3b8;
+  font-size: 8px;
+  animation: float-cloud 3s ease-in-out infinite;
+}
+
+.cloud-1 { 
+  top: 25%; 
+  left: 60%; 
+  animation-delay: 0s; 
+}
+
+.cloud-2 { 
+  top: 60%; 
+  left: 70%; 
+  animation-delay: 1s; 
+}
+
+.cloud-3 { 
+  top: 40%; 
+  left: 80%; 
+  animation-delay: 2s; 
+}
+
+.toggle-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+.theme-toggle:hover .toggle-label {
+  color: var(--accent-primary);
+}
+
+/* Animations */
+@keyframes toggleBounce {
+  0%, 100% { transform: scale(1) translateY(-2px); }
+  50% { transform: scale(1.1) translateY(-4px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes float-cloud {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-2px); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .theme-toggle-container {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .theme-toggle {
+    padding: 0.5rem;
+    gap: 0.25rem;
+  }
+  
+  .toggle-track {
+    width: 50px;
+    height: 26px;
+  }
+  
+  .toggle-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  
+  html.dark .toggle-thumb {
+    transform: translateX(22px);
+  }
+  
+  .toggle-icon {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .toggle-label {
+    font-size: 0.625rem;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .theme-toggle {
+    border-width: 3px;
+  }
+  
+  .toggle-track {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle,
+  .toggle-thumb,
+  .toggle-icon,
+  .toggle-stars,
+  .toggle-clouds {
+    transition: none;
+  }
+  
+  .star,
+  .cloud {
+    animation: none;
+  }
+  
+  .theme-toggle.animating {
+    animation: none;
+  }
+}
