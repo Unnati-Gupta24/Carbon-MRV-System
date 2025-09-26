@@ -7,6 +7,7 @@ import Navigation from './components/Navigation'
 import Token from './components/Token'
 import Footer from './components/Footer'
 import ThemeToggle from './components/ThemeToggle'
+import AuthModal from './components/AuthModal'
 
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
@@ -41,6 +42,67 @@ const App = () => {
     return saved !== null ? JSON.parse(saved) : true
   })
 
+  // Simplified Auth states
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(true)
+  const [userEmail, setUserEmail] = useState('')
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    const savedAuth = localStorage.getItem('userAuthenticated')
+    const savedEmail = localStorage.getItem('userEmail')
+    const authExpiry = localStorage.getItem('authExpiry')
+    
+    if (savedAuth && savedEmail && authExpiry) {
+      const expiryTime = parseInt(authExpiry)
+      if (Date.now() < expiryTime) {
+        setIsAuthenticated(true)
+        setUserEmail(savedEmail)
+        setShowAuthModal(false)
+      } else {
+        // Clear expired auth
+        localStorage.removeItem('userAuthenticated')
+        localStorage.removeItem('userEmail')
+        localStorage.removeItem('authExpiry')
+      }
+    }
+  }, [])
+
+  // Handle successful login
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+    setShowAuthModal(false)
+    setUserEmail('guptaunnati031@gmail.com')
+    
+    // Save auth state (expires in 24 hours)
+    const authExpiry = Date.now() + 24 * 60 * 60 * 1000
+    localStorage.setItem('userAuthenticated', 'true')
+    localStorage.setItem('userEmail', 'guptaunnati031@gmail.com')
+    localStorage.setItem('authExpiry', authExpiry.toString())
+    
+    showNotification('Successfully logged in!', 'success')
+  }
+
+  // Logout
+  const handleLogout = () => {
+    setIsAuthenticated(false)
+    setShowAuthModal(true)
+    setUserEmail('')
+    
+    // Clear auth data
+    localStorage.removeItem('userAuthenticated')
+    localStorage.removeItem('userEmail')
+    localStorage.removeItem('authExpiry')
+    
+    // Also disconnect wallet
+    setAccount('')
+    setIsConnected(false)
+    setIsVerified(false)
+    setBalance('0')
+    
+    showNotification('Logged out successfully', 'info')
+  }
+
   // Theme toggle function
   const toggleDarkMode = () => {
     const newMode = !darkMode
@@ -61,6 +123,11 @@ const App = () => {
 
   // === Wallet connect logic ===
   const connectWallet = async () => {
+    if (!isAuthenticated) {
+      showNotification('Please login first to connect wallet', 'error')
+      return
+    }
+
     try {
       setLoading(true)
       if (!window.ethereum) throw new Error('MetaMask not found')
@@ -148,16 +215,23 @@ const App = () => {
   }, [account])
 
   useEffect(() => {
-    fetchStats()
-  }, [])
+    if (isAuthenticated) {
+      fetchStats()
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && isAuthenticated) {
       fetchProjects()
     }
-  }, [isConnected, account, fetchProjects])
+  }, [isConnected, account, fetchProjects, isAuthenticated])
 
   const submitProject = async () => {
+    if (!isAuthenticated) {
+      showNotification('Please login first', 'error')
+      return
+    }
+
     if (!isConnected) {
       showNotification('Please connect wallet first', 'error')
       return
@@ -184,6 +258,7 @@ const App = () => {
       formData.append('area', newProject.area)
       formData.append('ecosystemType', newProject.ecosystemType)
       formData.append('userAddress', account)
+      formData.append('userEmail', userEmail)
 
       const response = await fetch(`${BACKEND_URL}/api/projects`, {
         method: 'POST',
@@ -235,6 +310,32 @@ const App = () => {
     connectWallet,
     loading,
     darkMode,
+    isAuthenticated,
+    userEmail,
+    onLogout: handleLogout,
+  }
+
+  // Don't render main content if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className={`app-container ${darkMode ? 'dark' : 'light'}`}>
+        <div className="bg-elements">
+          <div className="bg-circle bg-circle-1"></div>
+          <div className="bg-circle bg-circle-2"></div>
+          <div className="bg-circle bg-circle-3"></div>
+        </div>
+        
+        <ThemeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+        
+        <AuthModal
+          show={showAuthModal}
+          darkMode={darkMode}
+          onLoginSuccess={handleLoginSuccess}
+        />
+        
+        <Notification notification={notification} darkMode={darkMode} />
+      </div>
+    )
   }
 
   return (
