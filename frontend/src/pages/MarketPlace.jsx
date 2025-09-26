@@ -26,7 +26,7 @@ const Marketplace = () => {
 
   // Realistic chart data with more points
   const [chartData, setChartData] = useState([]);
-  const [selectedChart, setSelectedChart] = useState('ETH');
+  const [selectedChart, setSelectedChart] = useState('MATIC');
   const [walletConnected, setWalletConnected] = useState(false);
 
   const tokens = [
@@ -115,8 +115,7 @@ const Marketplace = () => {
     setIsLoading(true);
     // Simulate transaction
     await new Promise(resolve => setTimeout(resolve, 2000));
-    alert(`✅ Successfully swapped ${fromAmount} ${fromToken} for ${toAmount} ${toToken}`);
-    setIsLoading(false);
+    alert(`Failed to swap due to insufficient balance`);
     setFromAmount('');
     setToAmount('');
   };

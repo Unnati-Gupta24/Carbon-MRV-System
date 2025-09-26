@@ -135,7 +135,7 @@ const CreateProject = ({
                 <label className="form-label">
                   <div className="label-content">
                     <MapPin className="label-icon" />
-                    <span className="label-text">Location</span>
+                    <span className="label-text">Enter Location in coordinates</span>
                   </div>
                   <span className="label-required">*</span>
                 </label>
@@ -147,7 +147,7 @@ const CreateProject = ({
                     onChange={(e) =>
                       setNewProject({ ...newProject, location: e.target.value })
                     }
-                    placeholder="City, Country or GPS coordinates"
+                    placeholder="Latitude, Longitude (e.g. 12.3456, -78.9012)"
                   />
                   <div className="input-decoration"></div>
                 </div>
