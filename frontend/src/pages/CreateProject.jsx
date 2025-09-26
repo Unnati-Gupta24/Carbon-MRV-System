@@ -47,7 +47,7 @@ const CreateProject = ({
       'andaman satellite.PNG',
       'bovilian rainforest.PNG',
       'laut.PNG',
-      'north sentinel island.PNG',
+      'north sentinel island.png',
     ]
 
     // Remove loading state
