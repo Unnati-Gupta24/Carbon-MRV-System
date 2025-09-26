@@ -797,7 +797,78 @@
   height: 1.25rem;
 }
 
-/* Animations */
+/* Loading State */
+.upload-area[data-loading='true'] {
+  position: relative;
+  pointer-events: none;
+}
+
+.upload-area[data-loading='true']::after {
+  content: 'Analyzing image...';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  backdrop-filter: blur(4px);
+}
+
+/* Analysis Popup */
+.analysis-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+.popup-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 320px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.popup-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.popup-content h3 {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.popup-content p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.popup-close {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.popup-close:hover {
+  opacity: 0.9;
+}
+
 @keyframes ringPulse {
   0% {
     transform: translate(-50%, -50%) scale(1);
@@ -840,6 +911,28 @@
   100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
   }
 }
 
